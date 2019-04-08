@@ -1,0 +1,31 @@
+---
+version: 0.2
+
+env:
+  variables:
+    KEY: "value"
+
+phases:
+  install:
+    commands:
+      - make install
+  pre_build:
+    commands:
+      - make test
+      - echo ${RELEASE_BUCKET_NAME}
+      - echo ${ARTIFACT_NAME}
+      - echo ${ARTIFACT_FILENAME}
+  build:
+    commands:
+      - make build
+  post_build:
+    commands:
+      - echo Uploading artifact to S3.
+      - aws s3 cp $ARTIFACT_FILENAME s3://$RELEASE_BUCKET_NAME/$ARTIFACT_NAME
+        # - echo Updating release key.
+      - # - aws --region=eu-west-1 ssm put-parameter --name /$APP_NAME/releases/$CODEBUILD_RESOLVED_SOURCE_VERSION --value $ARTIFACT_FILENAME --type String --overwrite
+      - # - aws --region=eu-west-1 ssm put-parameter --name /$APP_NAME/releases/latest --value $ARTIFACT_FILENAME --type String --overwrite
+
+artifacts:
+  files:
+    - $ARTIFACT_FILENAME
