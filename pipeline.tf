@@ -4,7 +4,7 @@
 // }
 
 resource "aws_codepipeline" "codepipeline" {
-  name     = "tf-test-pipeline"
+  name     = "${var.project}"
   role_arn = "${aws_iam_role.codepipeline_role.arn}"
 
   artifact_store {
@@ -51,7 +51,7 @@ resource "aws_codepipeline" "codepipeline" {
       version         = "1"
 
       configuration = {
-        ProjectName = "test"
+        ProjectName = "${aws_codebuild_project.project.name}"
       }
     }
   }
