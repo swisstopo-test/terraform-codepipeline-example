@@ -1,6 +1,6 @@
 
 resource "aws_s3_bucket" "codepipeline_bucket" {
-  bucket = "${var.account_name}-${var.project}-releases"
+  bucket = "${var.project}-releases"
   acl    = "private"
   force_destroy = false
 }

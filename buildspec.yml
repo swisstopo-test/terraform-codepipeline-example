@@ -20,12 +20,9 @@ phases:
       - make build
   post_build:
     commands:
-      - echo Uploading artifact to S3.
-      - aws s3 cp $ARTIFACT_FILENAME s3://$RELEASE_BUCKET_NAME/$ARTIFACT_NAME
-        # - echo Updating release key.
-      - # - aws --region=eu-west-1 ssm put-parameter --name /$APP_NAME/releases/$CODEBUILD_RESOLVED_SOURCE_VERSION --value $ARTIFACT_FILENAME --type String --overwrite
-      - # - aws --region=eu-west-1 ssm put-parameter --name /$APP_NAME/releases/latest --value $ARTIFACT_FILENAME --type String --overwrite
+      - echo Post build command. Doint nothing.
 
 artifacts:
   files:
-    - $ARTIFACT_FILENAME
+    hello
+
