@@ -77,3 +77,50 @@ resource "aws_codepipeline" "codepipeline" {
     }
   }
 }
+
+
+
+
+// locals {
+//   webhook_secret = ""${data. aws_ssm_parameter.foo.value}""
+// }
+
+data "aws_ssm_parameter" "webhook_secret" {
+   name = "/${var.project}/webhook_secret"
+}
+
+data "github_repository" "example" {
+  full_name = "swisstopo-test/terraform-codepipeline-example"
+}
+
+resource "aws_codepipeline_webhook" "bar" {
+  name            = "test-webhook-github-bar"
+  authentication  = "GITHUB_HMAC"
+  target_action   = "Source"
+  target_pipeline = "${aws_codepipeline.codepipeline.name}"
+
+  authentication_configuration {
+    secret_token = "${data.aws_ssm_parameter.webhook_secret.value}"
+  }
+
+  filter {
+    json_path    = "$.ref"
+    match_equals = "refs/heads/{Branch}"
+  }
+}
+
+# Wire the CodePipeline webhook into a GitHub repository.
+resource "github_repository_webhook" "bar" {
+  repository = "${data.github_repository.example.name}"
+
+  name = "web"
+
+  configuration {
+    url          = "${aws_codepipeline_webhook.bar.url}"
+    content_type = "application/json"
+    insecure_ssl = false
+    secret       = "${data.aws_ssm_parameter.webhook_secret.value}"
+  }
+
+  events = ["push", "pull_request"]
+}
